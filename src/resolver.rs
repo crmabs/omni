@@ -501,7 +501,11 @@ impl DependencyResolver {
     }
 
     async fn get_dnf_version(&self, package_name: &str) -> Result<String> {
-        let output = Command::new("dnf").arg("info").arg(package_name).output()?;
+        let output = Command::new("dnf")
+            .arg("info")
+            .arg(package_name)
+            .output()
+            .await?;
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -607,7 +611,11 @@ impl DependencyResolver {
     }
 
     async fn get_apt_size(&self, package_name: &str) -> Result<u64> {
-        let output = Command::new("apt").arg("show").arg(package_name).output()?;
+        let output = Command::new("apt")
+            .arg("show")
+            .arg(package_name)
+            .output()
+            .await?;
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -625,7 +633,11 @@ impl DependencyResolver {
     }
 
     async fn get_dnf_size(&self, package_name: &str) -> Result<u64> {
-        let output = Command::new("dnf").arg("info").arg(package_name).output()?;
+        let output = Command::new("dnf")
+            .arg("info")
+            .arg(package_name)
+            .output()
+            .await?;
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);

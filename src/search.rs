@@ -223,7 +223,11 @@ impl SearchEngine {
     }
 
     async fn search_pacman(&self, query: &str) -> Result<Vec<SearchResult>> {
-        let output = Command::new("pacman").arg("-Ss").arg(query).output()?;
+        let output = Command::new("pacman")
+            .arg("-Ss")
+            .arg(query)
+            .output()
+            .await?;
 
         if !output.status.success() {
             return Ok(vec![]);
@@ -310,7 +314,11 @@ impl SearchEngine {
     }
 
     async fn search_flatpak(&self, query: &str) -> Result<Vec<SearchResult>> {
-        let output = Command::new("flatpak").arg("search").arg(query).output()?;
+        let output = Command::new("flatpak")
+            .arg("search")
+            .arg(query)
+            .output()
+            .await?;
 
         if !output.status.success() {
             return Ok(vec![]);
@@ -413,7 +421,11 @@ Dependencies: {}",
     }
 
     async fn get_apt_info(&self, package_name: &str) -> Result<String> {
-        let output = Command::new("apt").arg("show").arg(package_name).output()?;
+        let output = Command::new("apt")
+            .arg("show")
+            .arg(package_name)
+            .output()
+            .await?;
 
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).to_string())
@@ -423,7 +435,11 @@ Dependencies: {}",
     }
 
     async fn get_dnf_info(&self, package_name: &str) -> Result<String> {
-        let output = Command::new("dnf").arg("info").arg(package_name).output()?;
+        let output = Command::new("dnf")
+            .arg("info")
+            .arg(package_name)
+            .output()
+            .await?;
 
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).to_string())

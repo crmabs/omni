@@ -158,7 +158,11 @@ impl UpdateManager {
     }
 
     async fn check_snap_update(&self, package: &InstallRecord) -> Result<Option<UpdateCandidate>> {
-        let output = Command::new("snap").arg("refresh").arg("--list").output()?;
+        let output = Command::new("snap")
+            .arg("refresh")
+            .arg("--list")
+            .output()
+            .await?;
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);

@@ -945,23 +945,12 @@ impl OmniGui {
     /// Refresh package statistics with real data from the system
     fn refresh_stats(&mut self) {
         // Get real data from the brain's list_installed functionality
-        match self.brain.list_installed() {
-            Ok(installed_packages) => {
-                let total_installed: usize = installed_packages.values().map(|v| v.len()).sum();
-                self.package_stats
-                    .insert("Installed".to_string(), total_installed as u32);
-
-                // Store installed packages for display
-                self.installed_packages = installed_packages
-                    .into_iter()
-                    .flat_map(|(_, packages)| packages)
-                    .collect();
-            }
-            Err(e) => {
-                self.status = format!("Failed to get installed packages: {}", e);
-                self.package_stats.insert("Installed".to_string(), 0);
-            }
-        }
+        let installed_packages = self.brain.list_installed();
+        self.package_stats.insert(
+            "Installed".to_string(),
+            installed_packages.len() as u32,
+        );
+        self.installed_packages = installed_packages;
 
         // Placeholder for total available packages - would need package manager search
         // In a real implementation, this would query package repositories

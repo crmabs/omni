@@ -1,8 +1,7 @@
 use anyhow::{anyhow, Result};
-use async_trait::async_trait;
 use base64::prelude::*;
 use russh::*;
-use russh_keys::*;
+use russh::keys::{decode_secret_key, PrivateKeyWithHashAlg};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -88,13 +87,12 @@ struct SshClientHandler {
     auth_method: RealAuthMethod,
 }
 
-#[async_trait]
 impl client::Handler for SshClientHandler {
     type Error = anyhow::Error;
 
     async fn check_server_key(
         &mut self,
-        _server_public_key: &key::PublicKey,
+        _server_public_key: &russh::keys::PublicKey,
     ) -> Result<bool, Self::Error> {
         // In a real implementation, this would verify against known_hosts
         Ok(true)
@@ -464,7 +462,7 @@ impl RealSshSession {
                     .authenticate_password(&self.config.username, password)
                     .await?;
 
-                if !auth_result {
+                if !auth_result.success() {
                     return Err(anyhow!("Password authentication failed"));
                 }
                 info!("Password authentication successful");
@@ -485,10 +483,13 @@ impl RealSshSession {
                 };
 
                 let auth_result = session
-                    .authenticate_publickey(&self.config.username, Arc::new(key))
+                    .authenticate_publickey(
+                        &self.config.username,
+                        PrivateKeyWithHashAlg::new(Arc::new(key), None),
+                    )
                     .await?;
 
-                if !auth_result {
+                if !auth_result.success() {
                     return Err(anyhow!("Public key authentication failed"));
                 }
                 info!("Public key authentication successful");
